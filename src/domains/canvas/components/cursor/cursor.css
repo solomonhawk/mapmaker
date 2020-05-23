@@ -1,0 +1,10 @@
+.cursor {
+  position: absolute;
+  border-radius: 2px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  top: 0;
+  left: 0;
+  background-color: black;
+}

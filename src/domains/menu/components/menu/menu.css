@@ -1,0 +1,6 @@
+.menu {
+  display: flex;
+  background: rgba(50, 50, 50, 1);
+  padding: 4px;
+  height: 44px;
+}

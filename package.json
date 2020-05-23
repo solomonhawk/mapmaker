@@ -1,11 +1,14 @@
 {
-  "name": "app",
+  "name": "mapmaker",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-hook/throttle": "^2.1.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "classnames": "^2.2.6",
+    "lodash-es": "^4.17.15",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
