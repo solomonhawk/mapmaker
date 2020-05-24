@@ -1,7 +1,7 @@
-import React from "react"
-import { PointerContext } from "./context"
+import React from 'react'
+import { PointerContext } from './context'
 
-import "./pointer-container.css"
+import './pointer-container.css'
 
 class PointerContainer extends React.Component {
   state = {

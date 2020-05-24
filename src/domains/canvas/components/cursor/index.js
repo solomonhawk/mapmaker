@@ -1,9 +1,9 @@
-import React from "react"
-import { usePointer } from "../pointer-container/hook"
-import { useAppState } from "../../../../services/app-state"
-import { quantizedViewportCenter } from "../canvas/helpers"
+import React from 'react'
+import { usePointer } from '../pointer-container/hook'
+import { useAppState } from '../../../../services/app-state'
+import { quantizedViewportCenter } from '../canvas/helpers'
 
-import "./cursor.css"
+import './cursor.css'
 
 function mapCursorToZoomScaledGrid(pointer, offset, gridSize) {
   return {
@@ -13,7 +13,7 @@ function mapCursorToZoomScaledGrid(pointer, offset, gridSize) {
 }
 
 function Cursor({ viewport }) {
-  console.log("render cursor")
+  console.log('render cursor')
   const state = useAppState()
   const pointer = usePointer()
   const { gridSize } = state.canvas

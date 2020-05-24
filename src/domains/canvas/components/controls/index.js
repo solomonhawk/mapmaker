@@ -1,12 +1,12 @@
-import React from "react";
-import { useAppState } from "../../../../services/app-state";
-import "./controls.css";
+import React from 'react'
+import { useAppState } from '../../../../services/app-state'
+import './controls.css'
 
 function Controls() {
-  console.log("render controls");
-  const state = useAppState();
+  console.log('render controls')
+  const state = useAppState()
 
-  const { zoomScalePercent, actions } = state.canvas;
+  const { zoomScalePercent, actions } = state.canvas
 
   return (
     <div className="canvas-controls">
@@ -20,7 +20,7 @@ function Controls() {
         +
       </button>
     </div>
-  );
+  )
 }
 
-export default Controls;
+export default Controls

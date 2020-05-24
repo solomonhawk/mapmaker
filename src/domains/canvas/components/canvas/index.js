@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState } from "react"
-import Grid from "../grid"
-import Cursor from "../cursor"
-import Controls from "../controls"
-import PointerContainer from "../pointer-container"
-import ZoomContainer from "../zoom-container"
-import PanContainer from "../pan-container"
+import React, { useRef, useEffect, useState } from 'react'
+import Grid from '../grid'
+import Cursor from '../cursor'
+import Controls from '../controls'
+import PointerContainer from '../pointer-container'
+import ZoomContainer from '../zoom-container'
+import PanContainer from '../pan-container'
 
-import "./canvas.css"
+import './canvas.css'
 
 function Canvas() {
   const canvasRef = useRef()

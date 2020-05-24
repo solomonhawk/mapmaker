@@ -1,9 +1,9 @@
-import React from "react"
-import "./grid.css"
-import { useAppState } from "../../../../services/app-state"
+import React from 'react'
+import './grid.css'
+import { useAppState } from '../../../../services/app-state'
 
 function Grid() {
-  console.log("render grid")
+  console.log('render grid')
   const state = useAppState()
 
   const { translation, gridSize, zoomScale } = state.canvas

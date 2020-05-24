@@ -1,4 +1,4 @@
-import { useContext } from "react";
-import { PointerContext } from "./context";
+import { useContext } from 'react'
+import { PointerContext } from './context'
 
-export const usePointer = () => useContext(PointerContext);
+export const usePointer = () => useContext(PointerContext)

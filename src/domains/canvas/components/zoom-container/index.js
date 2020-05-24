@@ -1,8 +1,8 @@
-import React, { useCallback } from "react"
-import { useAppState } from "../../../../services/app-state"
-import { useThrottleCallback } from "@react-hook/throttle"
+import React, { useCallback } from 'react'
+import { useAppState } from '../../../../services/app-state'
+import { useThrottleCallback } from '@react-hook/throttle'
 
-import "./zoom-container.css"
+import './zoom-container.css'
 
 function ZoomContainer({ children }) {
   const state = useAppState()

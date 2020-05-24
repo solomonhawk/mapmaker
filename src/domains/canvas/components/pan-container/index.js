@@ -1,7 +1,7 @@
-import React, { useCallback, useState, useEffect } from "react"
-import { useAppState } from "../../../../services/app-state"
+import React, { useCallback, useState, useEffect } from 'react'
+import { useAppState } from '../../../../services/app-state'
 
-import "./pan-container.css"
+import './pan-container.css'
 
 const initialDragState = {
   dragging: false,
@@ -20,7 +20,7 @@ function PanContainer({ children }) {
   const { translate } = state.canvas.actions
 
   const onKeyDown = useCallback((e) => {
-    if (e.key === " ") {
+    if (e.key === ' ') {
       setCanDrag(true)
     }
   }, [])
@@ -64,36 +64,36 @@ function PanContainer({ children }) {
   )
 
   useEffect(() => {
-    document.body.addEventListener("keydown", onKeyDown)
-    document.body.addEventListener("keyup", onKeyUp)
+    document.body.addEventListener('keydown', onKeyDown)
+    document.body.addEventListener('keyup', onKeyUp)
 
     return () => {
-      document.body.removeEventListener("keydown", onKeyDown)
-      document.body.removeEventListener("keyup", onKeyUp)
+      document.body.removeEventListener('keydown', onKeyDown)
+      document.body.removeEventListener('keyup', onKeyUp)
     }
   }, [onKeyDown, onKeyUp])
 
   useEffect(() => {
-    document.body.addEventListener("mousedown", onBeginDrag)
+    document.body.addEventListener('mousedown', onBeginDrag)
 
     return () => {
-      document.body.removeEventListener("mousedown", onBeginDrag)
+      document.body.removeEventListener('mousedown', onBeginDrag)
     }
   }, [onBeginDrag])
 
   useEffect(() => {
-    document.body.addEventListener("mouseup", onEndDrag)
+    document.body.addEventListener('mouseup', onEndDrag)
 
     return () => {
-      document.body.removeEventListener("mouseup", onEndDrag)
+      document.body.removeEventListener('mouseup', onEndDrag)
     }
   }, [onEndDrag])
 
   useEffect(() => {
-    document.body.addEventListener("mousemove", onDrag)
+    document.body.addEventListener('mousemove', onDrag)
 
     return () => {
-      document.body.removeEventListener("mousemove", onDrag)
+      document.body.removeEventListener('mousemove', onDrag)
     }
   }, [onDrag])
 
@@ -101,7 +101,7 @@ function PanContainer({ children }) {
     <div
       className="pan-container viewport-container"
       style={{
-        cursor: canDrag ? "pointer" : "default",
+        cursor: canDrag ? 'pointer' : 'default',
       }}
     >
       {children}

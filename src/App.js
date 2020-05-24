@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from "react"
-import Menu from "./domains/menu/components/menu"
-import Toolbar from "./domains/toolbar/components/toolbar"
-import Canvas from "./domains/canvas/components/canvas"
-import { AppState } from "./services/app-state"
-import { Tools } from "./domains/toolbar"
+import React, { useState, useCallback } from 'react'
+import Menu from './domains/menu/components/menu'
+import Toolbar from './domains/toolbar/components/toolbar'
+import Canvas from './domains/canvas/components/canvas'
+import { AppState } from './services/app-state'
+import { Tools } from './domains/toolbar'
 
-import "./App.css"
+import './App.css'
 
 const GRID_BASE_SIZE = 50
 const MAX_ZOOM = 4
