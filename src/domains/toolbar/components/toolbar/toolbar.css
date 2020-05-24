@@ -35,7 +35,6 @@
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-.toolbar-btn:active,
 .toolbar-btn.selected {
   color: #fff;
   font-weight: bold;

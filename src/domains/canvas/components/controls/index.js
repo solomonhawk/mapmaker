@@ -10,15 +10,40 @@ function Controls() {
 
   return (
     <div className="canvas-controls">
-      <div className="canvas-zoom">{zoomScalePercent}%</div>
+      <ul className="canvas-controls-list">
+        <li className="canvas-controls-item canvas-control-item-zoom">
+          <div className="canvas-zoom">Zoom: {zoomScalePercent}%</div>
+        </li>
 
-      <button className="canvas-control" onClick={actions.zoomOut}>
-        -
-      </button>
+        <li className="canvas-controls-item">
+          <button
+            title="zoom out"
+            className="canvas-control-btn"
+            onClick={actions.zoomOut}
+          >
+            <span className="canvas-control-btn-text">-</span>
+          </button>
+        </li>
 
-      <button className="canvas-control" onClick={actions.zoomIn}>
-        +
-      </button>
+        <li className="canvas-controls-item">
+          <button
+            title="zoom in"
+            className="canvas-control-btn"
+            onClick={actions.zoomIn}
+          >
+            <span className="canvas-control-btn-text">+</span>
+          </button>
+        </li>
+
+        <li className="canvas-controls-item">
+          <button
+            className="canvas-control-btn"
+            onClick={actions.centerViewport}
+          >
+            <span className="canvas-control-btn-text">⌾</span>
+          </button>
+        </li>
+      </ul>
     </div>
   )
 }

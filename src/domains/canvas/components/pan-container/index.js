@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react'
 import { useAppState } from '../../../../services/app-state'
 
 import './pan-container.css'
+import { Tools } from '../../../toolbar/constants'
 
 const initialDragState = {
   dragging: false,
@@ -13,25 +14,37 @@ const initialDragState = {
 
 function PanContainer({ children }) {
   const state = useAppState()
+  const [previousTool, setPreviousTool] = useState(false)
   const [canDrag, setCanDrag] = useState(false)
   const [dragState, setDragState] = useState(initialDragState)
 
   const { translation } = state.canvas
   const { translate } = state.canvas.actions
 
+  const dragEnabled = canDrag || state.toolbar.selected === Tools.PAN
+
   const onKeyDown = useCallback((e) => {
     if (e.key === ' ') {
+      setPreviousTool(state.toolbar.selected)
       setCanDrag(true)
+      state.toolbar.actions.selectTool(Tools.PAN)
     }
   }, [])
 
-  const onKeyUp = useCallback((e) => {
-    setCanDrag(false)
-  }, [])
+  const onKeyUp = useCallback(
+    (e) => {
+      if (previousTool) {
+        state.toolbar.actions.selectTool(previousTool)
+        setPreviousTool(null)
+        setCanDrag(false)
+      }
+    },
+    [previousTool, state.toolbar.actions]
+  )
 
   const onBeginDrag = useCallback(
     (e) => {
-      if (canDrag) {
+      if (dragEnabled) {
         setDragState((dragState) => ({
           ...dragState,
           dragging: true,
@@ -40,7 +53,7 @@ function PanContainer({ children }) {
         }))
       }
     },
-    [canDrag]
+    [dragEnabled]
   )
 
   const onEndDrag = useCallback((e) => {
@@ -101,7 +114,7 @@ function PanContainer({ children }) {
     <div
       className="pan-container viewport-container"
       style={{
-        cursor: canDrag ? 'pointer' : 'default',
+        cursor: dragEnabled ? 'pointer' : 'default',
       }}
     >
       {children}

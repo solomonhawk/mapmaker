@@ -4,6 +4,7 @@ import Toolbar from './domains/toolbar/components/toolbar'
 import Canvas from './domains/canvas/components/canvas'
 import { AppState } from './services/app-state'
 import { Tools } from './domains/toolbar'
+import Controls from './domains/canvas/components/controls'
 
 import './App.css'
 
@@ -11,7 +12,12 @@ const GRID_BASE_SIZE = 50
 const MAX_ZOOM = 4
 const MIN_ZOOM = 0.05
 
+function canDraw(selectedTool) {
+  return [Tools.LINE, Tools.RECT, Tools.CIRCLE].includes(selectedTool)
+}
+
 function App() {
+  const [shapes, setShapes] = useState([])
   const [selectedTool, setSelectedTool] = useState(Tools.LINE)
   const [zoomScale, setZoomScale] = useState(1)
   const [translation, setTranslation] = useState({ x: 0, y: 0 })
@@ -27,16 +33,63 @@ function App() {
   }, [])
 
   const translate = useCallback(
-    (delta) => {
-      setTranslation((translation) => ({
-        x: delta.x,
-        y: delta.y,
-      }))
+    (translation) => {
+      setTranslation({
+        x: translation.x,
+        y: translation.y,
+      })
     },
     [setTranslation]
   )
 
+  const centerViewport = useCallback(() => {
+    setZoomScale(1)
+    setTranslation({
+      x: 0,
+      y: 0,
+    })
+  }, [setTranslation])
+
+  const addShape = useCallback(
+    (shape) => {
+      const newShape = { ...shape, id: shapes.length }
+      setShapes([...shapes, newShape])
+      return newShape
+    },
+    [shapes]
+  )
+
+  const removeShape = useCallback(
+    (shape) => {
+      if (shape.id === undefined) {
+        throw new Error('Cannot remove shape without an ID')
+      }
+      console.log('removing', shape)
+      const newShapes = shapes.slice()
+      newShapes.splice(shape.id, 1)
+      setShapes(newShapes)
+    },
+    [shapes]
+  )
+
+  const updateShape = useCallback(
+    (shape) => {
+      const updatedShapes = shapes.slice()
+      updatedShapes[shape.id] = shape
+      setShapes(updatedShapes)
+    },
+    [shapes]
+  )
+
   const appState = {
+    data: {
+      shapes,
+      actions: {
+        addShape,
+        removeShape,
+        updateShape,
+      },
+    },
     toolbar: {
       selected: selectedTool,
       actions: {
@@ -48,10 +101,12 @@ function App() {
       zoomScale,
       zoomScalePercent: parseInt(zoomScale * 100, 10),
       translation,
+      canDraw: canDraw(selectedTool),
       actions: {
         zoomIn,
         zoomOut,
         translate,
+        centerViewport,
       },
     },
   }
@@ -60,8 +115,9 @@ function App() {
     <AppState.Provider value={appState}>
       <div className="app-container">
         <Menu />
-        <Toolbar />
         <Canvas />
+        <Toolbar />
+        <Controls />
 
         <div className="app-debug">
           <pre>{JSON.stringify(appState, null, 2)}</pre>

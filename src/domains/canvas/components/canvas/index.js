@@ -1,14 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react'
 import Grid from '../grid'
 import Cursor from '../cursor'
-import Controls from '../controls'
+import ActiveTool from '../active-tool'
 import PointerContainer from '../pointer-container'
 import ZoomContainer from '../zoom-container'
 import PanContainer from '../pan-container'
+import { useAppState } from '../../../../services/app-state'
 
 import './canvas.css'
 
 function Canvas() {
+  const state = useAppState()
   const canvasRef = useRef()
   const [canvasSize, setCanvasSize] = useState(null)
 
@@ -18,6 +20,8 @@ function Canvas() {
     }
   }, [canvasRef, canvasSize])
 
+  window.canvasRef = canvasRef.current
+
   return (
     <div className="canvas" ref={canvasRef}>
       {canvasSize ? (
@@ -25,10 +29,16 @@ function Canvas() {
           <ZoomContainer>
             <PointerContainer viewport={canvasSize}>
               <Cursor viewport={canvasSize} />
+
+              {state.canvas.canDraw ? (
+                <ActiveTool
+                  container={canvasRef.current}
+                  viewport={canvasSize}
+                />
+              ) : null}
             </PointerContainer>
 
-            <Controls />
-            <Grid />
+            <Grid viewport={canvasSize} />
           </ZoomContainer>
         </PanContainer>
       ) : null}

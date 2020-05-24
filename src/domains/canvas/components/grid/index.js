@@ -1,8 +1,9 @@
 import React from 'react'
+import Shapes from '../shapes'
 import './grid.css'
 import { useAppState } from '../../../../services/app-state'
 
-function Grid() {
+function Grid({ viewport }) {
   console.log('render grid')
   const state = useAppState()
 
@@ -57,14 +58,14 @@ function Grid() {
           <pattern
             id="vCenter"
             x="50%"
-            width="100%"
+            width="1000"
             height="1"
             patternUnits="userSpaceOnUse"
             patternTransform={`translate(${translateX} ${translateY})`}
           >
             <path
               transform="translate(0.5 0)"
-              d="M 0 0 V 1"
+              d="M 0 0 V 1000"
               fill="none"
               stroke="#85b7c9"
               strokeWidth="1"
@@ -74,14 +75,14 @@ function Grid() {
           <pattern
             id="hCenter"
             y="50%"
-            height="100%"
+            height="1000"
             width="1"
             patternUnits="userSpaceOnUse"
             patternTransform={`translate(${translateX} ${translateY})`}
           >
             <path
               transform="translate(0 0.5)"
-              d="M 0 0 H 1"
+              d="M 0 0 H 1000"
               fill="none"
               stroke="#85b7c9"
               strokeWidth="1"
@@ -97,6 +98,14 @@ function Grid() {
 
         {/* Horizontal Centerline */}
         <rect width="100%" height="100%" x="0" y="0" fill="url(#hCenter)" />
+
+        <g
+          transform={`translate(${viewport.width / 2 + translation.x} ${
+            viewport.height / 2 + translation.y
+          })`}
+        >
+          <Shapes />
+        </g>
       </svg>
     </div>
   )

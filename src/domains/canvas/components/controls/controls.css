@@ -5,5 +5,37 @@
   right: 20px;
 }
 
-.canvas-control {
+.canvas-controls-list {
+  display: flex;
+  list-style: none;
+  align-items: center;
+}
+
+.canvas-controls-item + .canvas-controls-item {
+  margin-left: 4px;
+}
+
+.canvas-control-btn {
+  background: #333;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  border: none;
+  border-radius: 3px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.canvas-control-btn-text {
+  display: inline-block;
+  height: 24px;
+}
+
+.canvas-control-item-zoom {
+  font-size: 12px;
+  margin-right: 8px;
 }

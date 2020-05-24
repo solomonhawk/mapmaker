@@ -23,7 +23,7 @@ function ZoomContainer({ children }) {
     [zoomIn, zoomOut]
   )
 
-  const onScrollThrottled = useThrottleCallback(onScroll, 10, true)
+  const onScrollThrottled = useThrottleCallback(onScroll, 6, true)
 
   return (
     <div
