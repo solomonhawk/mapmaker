@@ -5,8 +5,8 @@ import "./pan-container.css"
 
 const initialDragState = {
   dragging: false,
-  startX: null,
-  startY: null,
+  startX: 0,
+  startY: 0,
   deltaX: 0,
   deltaY: 0,
 }
@@ -20,7 +20,6 @@ function PanContainer({ children }) {
   const { translate } = state.canvas.actions
 
   const onKeyDown = useCallback((e) => {
-    console.log(e.key)
     if (e.key === " ") {
       setCanDrag(true)
     }
@@ -30,21 +29,9 @@ function PanContainer({ children }) {
     setCanDrag(false)
   }, [])
 
-  useEffect(() => {
-    document.body.addEventListener("keydown", onKeyDown)
-    document.body.addEventListener("keyup", onKeyUp)
-
-    return () => {
-      document.body.removeEventListener("keydown", onKeyDown)
-      document.body.removeEventListener("keyup", onKeyUp)
-    }
-  }, [])
-
   const onBeginDrag = useCallback(
     (e) => {
       if (canDrag) {
-        console.log("begin drag")
-
         setDragState((dragState) => ({
           ...dragState,
           dragging: true,
@@ -57,7 +44,6 @@ function PanContainer({ children }) {
   )
 
   const onEndDrag = useCallback((e) => {
-    console.log("end drag")
     setDragState(initialDragState)
   }, [])
 
@@ -66,7 +52,6 @@ function PanContainer({ children }) {
       if (dragState.dragging) {
         const deltaX = e.clientX - dragState.startX
         const deltaY = e.clientY - dragState.startY
-        console.log("dragging", deltaX, deltaY)
 
         translate({
           x: translation.x + deltaX,
@@ -74,15 +59,47 @@ function PanContainer({ children }) {
         })
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [translate, dragState]
   )
 
+  useEffect(() => {
+    document.body.addEventListener("keydown", onKeyDown)
+    document.body.addEventListener("keyup", onKeyUp)
+
+    return () => {
+      document.body.removeEventListener("keydown", onKeyDown)
+      document.body.removeEventListener("keyup", onKeyUp)
+    }
+  }, [onKeyDown, onKeyUp])
+
+  useEffect(() => {
+    document.body.addEventListener("mousedown", onBeginDrag)
+
+    return () => {
+      document.body.removeEventListener("mousedown", onBeginDrag)
+    }
+  }, [onBeginDrag])
+
+  useEffect(() => {
+    document.body.addEventListener("mouseup", onEndDrag)
+
+    return () => {
+      document.body.removeEventListener("mouseup", onEndDrag)
+    }
+  }, [onEndDrag])
+
+  useEffect(() => {
+    document.body.addEventListener("mousemove", onDrag)
+
+    return () => {
+      document.body.removeEventListener("mousemove", onDrag)
+    }
+  }, [onDrag])
+
   return (
     <div
-      className="pan-container"
-      onMouseDown={onBeginDrag}
-      onMouseUp={onEndDrag}
-      onMouseMove={onDrag}
+      className="pan-container viewport-container"
       style={{
         cursor: canDrag ? "pointer" : "default",
       }}

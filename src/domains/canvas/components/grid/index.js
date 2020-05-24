@@ -8,16 +8,12 @@ function Grid() {
 
   const { translation, gridSize, zoomScale } = state.canvas
 
+  // TODO: scale?
   const translateX = translation.x // * zoomScale;
   const translateY = translation.y // * zoomScale;
 
   return (
-    <div
-      className="grid backdrop-enabled"
-      style={{
-        backgroundSize: 100 * zoomScale,
-      }}
-    >
+    <div className="grid">
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
@@ -30,7 +26,7 @@ function Grid() {
               d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`}
               fill="none"
               stroke="#afd8de"
-              stroke-width="1"
+              strokeWidth="1"
             />
           </pattern>
 
@@ -54,7 +50,7 @@ function Grid() {
               d={`M ${gridSize * 2} 0 L 0 0 0 ${gridSize * 2}`}
               fill="none"
               stroke="#afd8de"
-              stroke-width="2"
+              strokeWidth="2"
             />
           </pattern>
 
@@ -71,7 +67,7 @@ function Grid() {
               d="M 0 0 V 1"
               fill="none"
               stroke="#85b7c9"
-              stroke-width="1"
+              strokeWidth="1"
             />
           </pattern>
 
@@ -88,7 +84,7 @@ function Grid() {
               d="M 0 0 H 1"
               fill="none"
               stroke="#85b7c9"
-              stroke-width="1"
+              strokeWidth="1"
             />
           </pattern>
         </defs>

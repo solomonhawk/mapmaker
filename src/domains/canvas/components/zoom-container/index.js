@@ -10,21 +10,24 @@ function ZoomContainer({ children }) {
   const { zoomIn, zoomOut } = state.canvas.actions
 
   // TODO: get rid of stale synthetic event error
-  const onScroll = useCallback((e) => {
-    e.persist() // This doesn't do it
+  const onScroll = useCallback(
+    (e) => {
+      e.persist() // This doesn't do it
 
-    if (e.deltaY < 0) {
-      zoomIn()
-    } else if (e.deltaY > 0) {
-      zoomOut()
-    }
-  }, [])
+      if (e.deltaY < 0) {
+        zoomIn()
+      } else if (e.deltaY > 0) {
+        zoomOut()
+      }
+    },
+    [zoomIn, zoomOut]
+  )
 
   const onScrollThrottled = useThrottleCallback(onScroll, 10, true)
 
   return (
     <div
-      className="zoom-container"
+      className="zoom-container viewport-container"
       onScroll={onScrollThrottled}
       onWheel={onScrollThrottled}
     >

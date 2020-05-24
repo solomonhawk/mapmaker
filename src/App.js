@@ -28,7 +28,6 @@ function App() {
 
   const translate = useCallback(
     (delta) => {
-      console.log(delta)
       setTranslation((translation) => ({
         x: delta.x,
         y: delta.y,
