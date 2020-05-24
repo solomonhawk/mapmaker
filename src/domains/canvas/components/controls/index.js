@@ -13,7 +13,7 @@ function Controls() {
     if (confirm('Are you sure?')) {
       actions.clear()
     }
-  }, [actions.clear])
+  }, [actions])
 
   return (
     <div className="canvas-controls">

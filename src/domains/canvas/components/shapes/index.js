@@ -1,30 +1,47 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import { Tools } from '../../../toolbar'
 import Line from './line'
 import Rect from './rect'
 import Circle from './circle'
 
+const shapeMap = {
+  [Tools.LINE]: Line,
+  [Tools.RECT]: Rect,
+  [Tools.CIRCLE]: Circle,
+}
+
 function Shapes() {
   const state = useAppState()
 
-  const scaleFactor = state.canvas.zoomScale
+  const { selectShape } = state.canvas.actions
+  const { zoomScale, selectedShape } = state.canvas
+
+  const onSelectShape = useCallback(
+    (shape) => () => {
+      if (state.toolbar.selected === Tools.SELECT) {
+        selectShape(shape)
+      }
+    },
+    [state.toolbar.selected, selectShape]
+  )
 
   return state.data.shapes.map((shape) => {
-    if (shape.type === Tools.LINE) {
-      return <Line key={shape.id} scaleFactor={scaleFactor} {...shape} />
+    if (!(shape.type in shapeMap)) {
+      throw new Error(`Unkown shape! "${shape}"`)
     }
 
-    if (shape.type === Tools.RECT) {
-      return <Rect key={shape.id} scaleFactor={scaleFactor} {...shape} />
-    }
+    const Component = shapeMap[shape.type]
 
-    if (shape.type === Tools.CIRCLE) {
-      return <Circle key={shape.id} scaleFactor={scaleFactor} {...shape} />
-    }
-
-    console.error('Unknown shape', shape)
-    throw new Error('Unknown shape!')
+    return (
+      <Component
+        key={shape.id}
+        scaleFactor={zoomScale}
+        onSelect={onSelectShape(shape)}
+        selected={selectedShape ? shape.id === selectedShape.id : false}
+        {...shape}
+      />
+    )
   })
 }
 

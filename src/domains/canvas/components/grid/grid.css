@@ -3,6 +3,6 @@
   flex-grow: 1;
 }
 
-.grid svg {
-  shape-rendering: crispEdges;
+.grid svg *:focus {
+  outline: none;
 }

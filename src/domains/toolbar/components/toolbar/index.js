@@ -5,10 +5,6 @@ import cx from 'classnames'
 import { useAppState } from '../../../../services/app-state'
 import { Tools } from '../../constants'
 
-const stopPropagation = (e) => {
-  e.stopPropagation()
-}
-
 function Toolbar() {
   const state = useAppState()
 
@@ -18,22 +14,29 @@ function Toolbar() {
         <li className="toolbar-item">
           <button
             className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.PAN,
+              selected: state.toolbar.selected === Tools.SELECT,
             })}
-            onMouseDownCapture={stopPropagation}
-            onMouseUpCapture={stopPropagation}
-            onClick={() => state.toolbar.actions.selectTool(Tools.PAN)}
+            onClick={() => state.toolbar.actions.selectTool(Tools.SELECT)}
           >
-            ◇
+            ⍙
           </button>
         </li>
         <li className="toolbar-item">
           <button
             className={cx('toolbar-btn', {
+              selected: state.toolbar.selected === Tools.PAN,
+            })}
+            onClick={() => state.toolbar.actions.selectTool(Tools.PAN)}
+          >
+            ❖
+          </button>
+        </li>
+
+        <li className="toolbar-item">
+          <button
+            className={cx('toolbar-btn', {
               selected: state.toolbar.selected === Tools.LINE,
             })}
-            onMouseDownCapture={stopPropagation}
-            onMouseUpCapture={stopPropagation}
             onClick={() => state.toolbar.actions.selectTool(Tools.LINE)}
           >
             ⎮
@@ -44,8 +47,6 @@ function Toolbar() {
             className={cx('toolbar-btn', {
               selected: state.toolbar.selected === Tools.RECT,
             })}
-            onMouseDownCapture={stopPropagation}
-            onMouseUpCapture={stopPropagation}
             onClick={() => state.toolbar.actions.selectTool(Tools.RECT)}
           >
             □
@@ -56,8 +57,6 @@ function Toolbar() {
             className={cx('toolbar-btn', {
               selected: state.toolbar.selected === Tools.CIRCLE,
             })}
-            onMouseDownCapture={stopPropagation}
-            onMouseUpCapture={stopPropagation}
             onClick={() => state.toolbar.actions.selectTool(Tools.CIRCLE)}
           >
             ⃝

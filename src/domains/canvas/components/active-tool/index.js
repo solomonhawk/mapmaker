@@ -23,6 +23,17 @@ function ActiveTool({ viewport, container }) {
     return mapPointerToGridOrigin(position, viewport, state.canvas)
   }, [pointer, state.canvas, viewport])
 
+  // prevent click from reaching canvas container which would otherwise
+  // trigger an `unselectShape` action at the wrong time
+  const onClick = useCallback(
+    (e) => {
+      if (currentShape) {
+        e.stopPropagation()
+      }
+    },
+    [currentShape]
+  )
+
   const onBeginShape = useCallback(
     (e) => {
       const shape = addShape({
@@ -55,7 +66,8 @@ function ActiveTool({ viewport, container }) {
         const endPoint = currentPoint()
 
         if (
-          currentShape.type === Tools.LINE &&
+          (currentShape.type === Tools.LINE ||
+            currentShape.type === Tools.CIRCLE) &&
           currentShape.points[0].x === endPoint.x &&
           currentShape.points[0].y === endPoint.y
         ) {
@@ -67,10 +79,12 @@ function ActiveTool({ viewport, container }) {
         ) {
           removeShape(currentShape)
         } else {
-          updateShape({
+          const newShape = {
             ...currentShape,
             points: [currentShape.points[0], endPoint],
-          })
+          }
+
+          updateShape(newShape, true)
         }
 
         setCurrentShape(null)
@@ -80,16 +94,18 @@ function ActiveTool({ viewport, container }) {
   )
 
   useEffect(() => {
+    container.addEventListener('click', onClick)
     container.addEventListener('mousedown', onBeginShape)
     container.addEventListener('mousemove', onUpdateShape)
     container.addEventListener('mouseup', onEndShape)
 
     return () => {
+      container.removeEventListener('click', onClick)
       container.removeEventListener('mousedown', onBeginShape)
       container.removeEventListener('mousemove', onUpdateShape)
       container.removeEventListener('mouseup', onEndShape)
     }
-  }, [container, onBeginShape, onUpdateShape, onEndShape])
+  }, [container, onClick, onBeginShape, onUpdateShape, onEndShape])
 
   return null
 }
