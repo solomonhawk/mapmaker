@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import { usePointer } from '../pointer-container/hook'
 
@@ -7,6 +7,7 @@ import {
   mapPointerToGrid,
   quantizedViewportCenter,
 } from '../canvas/helpers'
+import { Tools } from '../../../toolbar'
 
 function ActiveTool({ viewport, container }) {
   const state = useAppState()
@@ -54,8 +55,15 @@ function ActiveTool({ viewport, container }) {
         const endPoint = currentPoint()
 
         if (
+          currentShape.type === Tools.LINE &&
           currentShape.points[0].x === endPoint.x &&
           currentShape.points[0].y === endPoint.y
+        ) {
+          removeShape(currentShape)
+        } else if (
+          currentShape.type === Tools.RECT &&
+          (currentShape.points[0].x === endPoint.x ||
+            currentShape.points[0].y === endPoint.y)
         ) {
           removeShape(currentShape)
         } else {

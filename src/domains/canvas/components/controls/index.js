@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import './controls.css'
 
@@ -7,6 +7,13 @@ function Controls() {
   const state = useAppState()
 
   const { zoomScalePercent, actions } = state.canvas
+
+  const clearCanvas = useCallback(() => {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Are you sure?')) {
+      actions.clear()
+    }
+  }, [actions.clear])
 
   return (
     <div className="canvas-controls">
@@ -41,6 +48,16 @@ function Controls() {
             onClick={actions.centerViewport}
           >
             <span className="canvas-control-btn-text">⌾</span>
+          </button>
+        </li>
+
+        <li className="canvas-controls-item">
+          <button
+            className="canvas-control-btn"
+            disabled={!state.data.shapes.length}
+            onClick={clearCanvas}
+          >
+            <span className="canvas-control-btn-text">×</span>
           </button>
         </li>
       </ul>

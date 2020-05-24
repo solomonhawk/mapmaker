@@ -15,7 +15,7 @@ function Rect({ id, points: [start, end], scaleFactor }) {
       y={startY}
       width={endX - startX}
       height={endY - startY}
-      stroke-width="2"
+      strokeWidth="2"
       stroke="#333"
       fill="transparent"
     />

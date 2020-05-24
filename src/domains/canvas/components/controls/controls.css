@@ -30,6 +30,11 @@
   padding: 4px;
 }
 
+.canvas-control-btn[disabled] {
+  color: rgba(255, 255, 255, 0.5);
+  background: #555;
+}
+
 .canvas-control-btn-text {
   display: inline-block;
   height: 24px;

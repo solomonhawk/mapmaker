@@ -29,6 +29,9 @@ function PanContainer({ children }) {
       setCanDrag(true)
       state.toolbar.actions.selectTool(Tools.PAN)
     }
+    // Intentionally omitted so that onKeyDown only sees the state as it existed
+    // prior to initiating the pan tool
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onKeyUp = useCallback(
