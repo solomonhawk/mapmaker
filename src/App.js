@@ -26,7 +26,7 @@ function canDraw(selectedTool) {
 
 const initialSelectedShapes = []
 const initialSelectedShapeIds = []
-const initialZoomScale = 0.5
+const initialZoomScale = 1
 const initialTranslation = { x: 0, y: 0 }
 
 const ACTIONS = {
