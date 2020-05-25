@@ -2,13 +2,15 @@
   display: flex;
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
+  z-index: 1;
 }
 
 .canvas-controls-list {
   display: flex;
   list-style: none;
   align-items: center;
+  padding: 0;
   margin: 0;
 }
 
@@ -41,7 +43,42 @@
   height: 24px;
 }
 
-.canvas-control-item-zoom {
+.canvas-controls-item.canvas-control-item-zoom {
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.selected-count {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+}
+
+.selected-count-text {
   font-size: 12px;
   margin-right: 8px;
+  line-height: 1;
+}
+
+.selected-count-icon {
+  margin: 0 8px 0 4px;
+  font-size: 16px;
+  line-height: 10px;
+}
+
+.selected-btn {
+  border: none;
+  padding: 8px;
+  font-weight: bold;
+}
+
+.selected-btn + .selected-btn {
+  margin-left: 8px;
 }

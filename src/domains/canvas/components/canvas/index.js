@@ -14,17 +14,23 @@ function Canvas() {
   const canvasRef = useRef()
   const [canvasSize, setCanvasSize] = useState(null)
 
-  const { removeSelectedShape } = state.data.actions
-  const { unselectShape } = state.canvas.actions
+  const { removeSelectedShapes } = state.data.actions
+  const { deselectShapes } = state.canvas.actions
 
   const onKeyDown = useCallback(
     (e) => {
       if (e.key === 'Backspace') {
-        removeSelectedShape()
+        removeSelectedShapes()
       }
     },
-    [removeSelectedShape]
+    [removeSelectedShapes]
   )
+
+  const onClick = useCallback(() => {
+    if (!state.canvas.canDraw) {
+      deselectShapes()
+    }
+  }, [state.canvas.canDraw, deselectShapes])
 
   const onResize = useCallback(() => {
     setCanvasSize(canvasRef.current.getBoundingClientRect())
@@ -36,6 +42,7 @@ function Canvas() {
     }
   }, [canvasRef, canvasSize])
 
+  // Backspace
   useEffect(() => {
     document.body.addEventListener('keydown', onKeyDown)
     return () => document.body.removeEventListener('keydown', onKeyDown)
@@ -47,7 +54,7 @@ function Canvas() {
   }, [onResize])
 
   return (
-    <div className="canvas" ref={canvasRef} onClick={unselectShape}>
+    <div className="canvas" ref={canvasRef} tabIndex={0} onClick={onClick}>
       {canvasSize ? (
         <PanContainer>
           <ZoomContainer>
@@ -55,17 +62,17 @@ function Canvas() {
               container={canvasRef.current}
               viewport={canvasSize}
             >
-              <Cursor viewport={canvasSize} />
+              {state.canvas.canDraw ? <Cursor viewport={canvasSize} /> : null}
 
-              {state.canvas.canDraw ? (
-                <ActiveTool
-                  container={canvasRef.current}
-                  viewport={canvasSize}
-                />
-              ) : null}
+              <Grid viewport={canvasSize}>
+                {state.canvas.canDraw ? (
+                  <ActiveTool
+                    container={canvasRef.current}
+                    viewport={canvasSize}
+                  />
+                ) : null}
+              </Grid>
             </PointerContainer>
-
-            <Grid viewport={canvasSize} />
           </ZoomContainer>
         </PanContainer>
       ) : null}

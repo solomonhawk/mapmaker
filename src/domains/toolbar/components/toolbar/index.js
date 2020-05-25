@@ -1,69 +1,69 @@
 import './toolbar.css'
 
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import cx from 'classnames'
 import { useAppState } from '../../../../services/app-state'
 import { Tools } from '../../constants'
+import Hotkeys from '../hotkeys'
 
 function Toolbar() {
   const state = useAppState()
 
-  return (
-    <div className="toolbar tools">
-      <ul className="toolbar-list">
-        <li className="toolbar-item">
-          <button
-            className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.SELECT,
-            })}
-            onClick={() => state.toolbar.actions.selectTool(Tools.SELECT)}
-          >
-            ⍙
-          </button>
-        </li>
-        <li className="toolbar-item">
-          <button
-            className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.PAN,
-            })}
-            onClick={() => state.toolbar.actions.selectTool(Tools.PAN)}
-          >
-            ❖
-          </button>
-        </li>
+  const { selectTool } = state.toolbar.actions
 
-        <li className="toolbar-item">
-          <button
-            className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.LINE,
-            })}
-            onClick={() => state.toolbar.actions.selectTool(Tools.LINE)}
-          >
-            ⎮
-          </button>
-        </li>
-        <li className="toolbar-item">
-          <button
-            className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.RECT,
-            })}
-            onClick={() => state.toolbar.actions.selectTool(Tools.RECT)}
-          >
-            □
-          </button>
-        </li>
-        <li className="toolbar-item">
-          <button
-            className={cx('toolbar-btn', {
-              selected: state.toolbar.selected === Tools.CIRCLE,
-            })}
-            onClick={() => state.toolbar.actions.selectTool(Tools.CIRCLE)}
-          >
-            ⃝
-          </button>
-        </li>
-      </ul>
-    </div>
+  const onSelectTool = useCallback(
+    (tool) => (e) => {
+      if (!e.shiftKey && !e.metaKey && !e.altKey) {
+        e.preventDefault()
+        e.stopPropagation()
+        selectTool(tool)
+      }
+    },
+    [selectTool]
+  )
+
+  const tools = useMemo(
+    () =>
+      [
+        { type: Tools.SELECT, icon: '⍙' },
+        { type: Tools.PAN, icon: '❖' },
+        { type: Tools.LINE, icon: '⎮' },
+        { type: Tools.RECT, icon: '□' },
+        { type: Tools.CIRCLE, icon: ' ⃝' },
+      ].map((t, i) => ({ ...t, binding: i + 1 })),
+    []
+  )
+
+  return (
+    <>
+      <Hotkeys
+        bindings={tools.reduce(
+          (acc, tool) => ({
+            ...acc,
+            [tool.binding]: onSelectTool(tool.type),
+          }),
+          {}
+        )}
+      />
+
+      <div className="toolbar tools">
+        <ul className="toolbar-list">
+          {tools.map((tool) => (
+            <li
+              key={tool.type}
+              data-hotkey={tool.binding}
+              className={cx('toolbar-item', {
+                selected: state.toolbar.selected === tool.type,
+              })}
+            >
+              <button onClick={onSelectTool(tool.type)} className="toolbar-btn">
+                {tool.icon}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
   )
 }
 

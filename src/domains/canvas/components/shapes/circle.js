@@ -1,22 +1,19 @@
 import React from 'react'
 
-function Circle({ points: [start, end], selected, onSelect, scaleFactor }) {
-  const s = (v) => v * scaleFactor
-  const deltaX = Math.abs(end.x - start.x)
-  const deltaY = Math.abs(end.y - start.y)
-  const r = s(Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)))
-  // const r = s(Math.max(deltaX, deltaY))
+function Circle({ shape, selected, onFocus, onSelect, scale }) {
+  const { x, y, radius } = shape
 
   const circleProps = {
-    cx: s(start.x),
-    cy: s(start.y),
+    r: scale(radius),
+    cx: scale(x),
+    cy: scale(y),
     fill: 'none',
-    r,
   }
 
   return (
     <>
-      <circle {...circleProps} strokeWidth="2" stroke="#333" />
+      <circle {...circleProps} strokeWidth={2} stroke="#333" />
+
       {/* Clickable region */}
       <circle
         tabIndex={0}
@@ -26,12 +23,10 @@ function Circle({ points: [start, end], selected, onSelect, scaleFactor }) {
         stroke="#05bdeb"
         strokeOpacity={selected ? 0.3 : 0}
         pointerEvents="visible"
-        onFocus={() => {
-          onSelect()
-        }}
+        onFocus={onFocus}
         onClick={(e) => {
+          onSelect(e)
           e.stopPropagation()
-          onSelect()
         }}
       />
     </>

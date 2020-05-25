@@ -1,8 +1,17 @@
 import React from 'react'
 
-function Line({ points: [start, end], selected, onSelect, scaleFactor }) {
-  const s = (v) => v * scaleFactor
-  const pathData = `M ${s(start.x)} ${s(start.y)} L ${s(end.x)} ${s(end.y)}`
+function Line({ shape, selected, onFocus, onSelect, scale }) {
+  const { points } = shape
+  const [start, end] = points
+
+  // const shorterDimension = Math.min(
+  //   Math.abs(end.x - start.x),
+  //   Math.abs(end.y - start.y)
+  // )
+
+  const pathData = `M ${scale(start.x)} ${scale(start.y)} L ${scale(
+    end.x
+  )} ${scale(end.y)}`
 
   return (
     <>
@@ -17,12 +26,10 @@ function Line({ points: [start, end], selected, onSelect, scaleFactor }) {
         strokeOpacity={selected ? 0.3 : 0}
         strokeLinecap="round"
         pointerEvents="visible"
-        onFocus={() => {
-          onSelect()
-        }}
+        onFocus={onFocus}
         onClick={(e) => {
+          onSelect(e)
           e.stopPropagation()
-          onSelect()
         }}
       />
     </>

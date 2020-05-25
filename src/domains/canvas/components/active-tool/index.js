@@ -1,30 +1,41 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import { usePointer } from '../pointer-container/hook'
+import Shapes from '../shapes'
+import { createShape } from '../../../../data/shapes'
 
 import {
   mapPointerToGridOrigin,
   mapPointerToGrid,
   quantizedViewportCenter,
 } from '../canvas/helpers'
-import { Tools } from '../../../toolbar'
+
+const PENDING_SHAPE_ID = 'PENDING_SHAPE'
+
+const initialModifiers = {
+  shift: false,
+  meta: false,
+  alt: false,
+}
 
 function ActiveTool({ viewport, container }) {
   const state = useAppState()
   const pointer = usePointer()
 
-  const { addShape, updateShape, removeShape } = state.data.actions
+  const { addShape, removeShape } = state.data.actions
 
   const [currentShape, setCurrentShape] = useState(null)
+  const [modifiers, setModifiers] = useState(initialModifiers)
 
   const currentPoint = useCallback(() => {
     const totalOffset = quantizedViewportCenter(viewport, state.canvas)
     const position = mapPointerToGrid(pointer, totalOffset, state.canvas)
+
     return mapPointerToGridOrigin(position, viewport, state.canvas)
   }, [pointer, state.canvas, viewport])
 
   // prevent click from reaching canvas container which would otherwise
-  // trigger an `unselectShape` action at the wrong time
+  // trigger an `deselectShapes` action at the wrong time
   const onClick = useCallback(
     (e) => {
       if (currentShape) {
@@ -34,16 +45,33 @@ function ActiveTool({ viewport, container }) {
     [currentShape]
   )
 
+  const onKeyDown = useCallback(
+    (e) => {
+      const key = e.key.toLowerCase()
+
+      if (key in modifiers) {
+        setModifiers({ ...modifiers, [key]: true })
+      }
+    },
+    [modifiers, setModifiers]
+  )
+
+  const onKeyUp = useCallback(() => {
+    setModifiers(initialModifiers)
+  }, [])
+
   const onBeginShape = useCallback(
     (e) => {
-      const shape = addShape({
-        type: state.toolbar.selected,
-        points: [currentPoint(), currentPoint()],
-      })
+      const startPoint = currentPoint()
 
-      setCurrentShape(shape)
+      setCurrentShape(
+        createShape(state.toolbar.selected, {
+          id: PENDING_SHAPE_ID,
+          controlPoints: [startPoint, startPoint],
+        })
+      )
     },
-    [addShape, currentPoint, state.toolbar.selected]
+    [currentPoint, state.toolbar.selected]
   )
 
   const onUpdateShape = useCallback(
@@ -51,46 +79,34 @@ function ActiveTool({ viewport, container }) {
       if (currentShape) {
         const endPoint = currentPoint()
 
-        updateShape({
-          ...currentShape,
-          points: [currentShape.points[0], endPoint],
-        })
+        setCurrentShape(
+          currentShape.update({
+            controlPoints: [currentShape.controlPoints[0], endPoint],
+          })
+        )
       }
     },
-    [currentPoint, currentShape, updateShape]
+    [currentPoint, currentShape]
   )
 
   const onEndShape = useCallback(
     (e) => {
       if (currentShape) {
         const endPoint = currentPoint()
+        const shape = createShape(currentShape.type, {
+          controlPoints: [currentShape.controlPoints[0], endPoint],
+        })
 
-        if (
-          (currentShape.type === Tools.LINE ||
-            currentShape.type === Tools.CIRCLE) &&
-          currentShape.points[0].x === endPoint.x &&
-          currentShape.points[0].y === endPoint.y
-        ) {
-          removeShape(currentShape)
-        } else if (
-          currentShape.type === Tools.RECT &&
-          (currentShape.points[0].x === endPoint.x ||
-            currentShape.points[0].y === endPoint.y)
-        ) {
+        if (!shape.valid()) {
           removeShape(currentShape)
         } else {
-          const newShape = {
-            ...currentShape,
-            points: [currentShape.points[0], endPoint],
-          }
-
-          updateShape(newShape, true)
+          addShape(shape)
         }
 
         setCurrentShape(null)
       }
     },
-    [currentShape, updateShape, removeShape, currentPoint]
+    [currentShape, addShape, removeShape, currentPoint]
   )
 
   useEffect(() => {
@@ -107,7 +123,22 @@ function ActiveTool({ viewport, container }) {
     }
   }, [container, onClick, onBeginShape, onUpdateShape, onEndShape])
 
-  return null
+  useEffect(() => {
+    document.body.addEventListener('keydown', onKeyDown, true)
+    document.body.addEventListener('keyup', onKeyUp, true)
+
+    return () => {
+      document.body.removeEventListener('keydown', onKeyDown, true)
+      document.body.removeEventListener('keyup', onKeyUp, true)
+    }
+  }, [onKeyDown, onKeyUp])
+
+  return (
+    <Shapes
+      shapes={currentShape ? [currentShape] : []}
+      constrained={!!modifiers.shift}
+    />
+  )
 }
 
 export default ActiveTool

@@ -3,11 +3,12 @@ import Shapes from '../shapes'
 import './grid.css'
 import { useAppState } from '../../../../services/app-state'
 
-function Grid({ viewport }) {
-  console.log('render grid')
+function Grid({ viewport, children }) {
+  // console.log('render grid')
   const state = useAppState()
 
-  const { translation, gridSize, zoomScale } = state.canvas
+  const { shapes } = state.data
+  const { translation, gridSize, zoomScale, selectedShapeIds } = state.canvas
 
   // TODO: scale?
   const translateX = translation.x // * zoomScale;
@@ -104,7 +105,8 @@ function Grid({ viewport }) {
             viewport.height / 2 + translation.y
           })`}
         >
-          <Shapes />
+          {children}
+          <Shapes shapes={shapes} selectedShapeIds={selectedShapeIds} />
         </g>
       </svg>
     </div>

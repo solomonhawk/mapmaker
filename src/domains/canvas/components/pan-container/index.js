@@ -23,16 +23,20 @@ function PanContainer({ children }) {
 
   const dragEnabled = canDrag || state.toolbar.selected === Tools.PAN
 
-  const onKeyDown = useCallback((e) => {
-    if (e.key === ' ') {
-      setPreviousTool(state.toolbar.selected)
-      setCanDrag(true)
-      state.toolbar.actions.selectTool(Tools.PAN)
-    }
-    // Intentionally omitted so that onKeyDown only sees the state as it existed
-    // prior to initiating the pan tool
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const onKeyDown = useCallback(
+    (e) => {
+      if (e.key === ' ' && !canDrag) {
+        setPreviousTool(state.toolbar.selected)
+        setCanDrag(true)
+        state.toolbar.actions.selectTool(Tools.PAN)
+      }
+
+      // Intentionally omitted so that onKeyDown only sees the state as it existed
+      // prior to initiating the pan tool
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [canDrag, state.toolbar.selected, state.toolbar.actions]
+  )
 
   const onKeyUp = useCallback(
     (e) => {
@@ -79,6 +83,7 @@ function PanContainer({ children }) {
     [translate, dragState]
   )
 
+  // hold Space to temporarily enable Pan mode
   useEffect(() => {
     document.body.addEventListener('keydown', onKeyDown)
     document.body.addEventListener('keyup', onKeyUp)

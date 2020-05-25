@@ -11,23 +11,34 @@ body {
   overflow: hidden;
 }
 
-.app-container {
-  text-align: center;
+.app-wrapper {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
   height: 100%;
 }
 
 .app-debug {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  font-size: 10px;
-  pointer-events: none;
+  background: #333;
+  color: #fff;
+  padding: 8px;
+  width: 20%;
+  flex-basis: 20%;
+  font-size: 12px;
+  overflow: scroll;
+  flex-shrink: 0;
+  min-width: 300px;
 }
 
 .app-debug pre {
   text-align: left;
+  margin: 0;
 }
 
 .viewport-container {

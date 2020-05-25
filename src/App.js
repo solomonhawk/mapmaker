@@ -1,3 +1,5 @@
+import 'what-input'
+
 import React, { useReducer, useCallback, useEffect } from 'react'
 // import Menu from './domains/menu/components/menu'
 import Toolbar from './domains/toolbar/components/toolbar'
@@ -6,12 +8,14 @@ import { AppState } from './services/app-state'
 import { Tools } from './domains/toolbar'
 import Controls from './domains/canvas/components/controls'
 import without from 'lodash-es/without'
+import ShapesList from './data/shapes-list'
+import { createShape } from './data/shapes'
 
 import './App.css'
 
 const GRID_BASE_SIZE = 50
 const MAX_ZOOM = 4
-const MIN_ZOOM = 0.1
+const MIN_ZOOM = 0.125
 
 const STORAGE_KEY = 'mapmaker-shapes'
 const STORAGE_KEY_ZOOM = 'mapmaker-zoom'
@@ -21,6 +25,8 @@ function canDraw(selectedTool) {
   return [Tools.LINE, Tools.RECT, Tools.CIRCLE].includes(selectedTool)
 }
 
+const initialSelectedShapes = []
+const initialSelectedShapeIds = []
 const initialZoomScale = 0.5
 const initialTranslation = { x: 0, y: 0 }
 
@@ -31,9 +37,16 @@ const ACTIONS = {
   ADD_SHAPE: 'ADD_SHAPE',
   UPDATE_SHAPE: 'UPDATE_SHAPE',
   REMOVE_SHAPE: 'REMOVE_SHAPE',
-  REMOVE_SELECTED_SHAPE: 'REMOVE_SELECTED_SHAPE',
+  REMOVE_SELECTED_SHAPES: 'REMOVE_SELECTED_SHAPES',
+
   SELECT_SHAPE: 'SELECT_SHAPE',
-  UNSELECT_SHAPE: 'UNSELECT_SHAPE',
+  DESELECT_SHAPES: 'DESELECT_SHAPES',
+
+  GROUP_SHAPES: 'GROUP_SHAPES',
+  UNGROUP_SHAPES: 'UNGROUP_SHAPES',
+
+  PROMOTE_SHAPE: 'PROMOTE_SHAPE',
+  DEMOTE_SHAPE: 'DEMOTE_SHAPE',
 
   SELECT_TOOL: 'SELECT_TOOL',
 
@@ -45,6 +58,11 @@ const ACTIONS = {
 }
 
 const reducer = (state, action) => {
+  console.group(action.type)
+  console.log('State Before: ', { ...state })
+  console.log('Action: ', action)
+  console.groupEnd()
+
   switch (action.type) {
     // Startup
 
@@ -54,7 +72,7 @@ const reducer = (state, action) => {
         loading: false,
         zoomScale: action.payload.zoomScale || initialZoomScale,
         translation: action.payload.translation || initialTranslation,
-        shapes: action.payload.shapes || [],
+        shapesList: new ShapesList(action.payload.shapes || []),
       }
 
     // Shapes
@@ -62,54 +80,127 @@ const reducer = (state, action) => {
     case ACTIONS.CLEAR_SHAPES:
       return {
         ...state,
-        shapes: [],
-        selectedShape: null,
+        shapesList: state.shapesList.reset(),
+        selectedShapes: initialSelectedShapes,
       }
 
     case ACTIONS.ADD_SHAPE:
+      const shape = { ...action.payload, id: ShapesList.generateId() }
+
       return {
         ...state,
-        shapes: [...state.shapes, action.payload],
+        shapesList: state.shapesList.add(shape),
+        selectedShapes: [shape],
+        selectedShapeIds: [shape.id],
       }
 
     case ACTIONS.UPDATE_SHAPE: {
-      const updatedShapes = state.shapes.slice()
-      updatedShapes[action.payload.id] = action.payload
-
       return {
         ...state,
-        shapes: updatedShapes,
+        shapesList: state.shapesList.update(action.payload),
         selectedShape: action.selectAfterUpdate
-          ? action.payload
-          : state.selectedShape,
+          ? [action.payload]
+          : state.selectedShapes,
+        selectedShapeIds: action.selectAfterUpdate
+          ? [action.payload.id]
+          : state.selectedShapeIds,
       }
     }
 
     case ACTIONS.REMOVE_SHAPE: {
       return {
         ...state,
-        shapes: without(state.shapes, action.payload),
+        shapesList: state.shapesList.removeById(action.payload.id),
+        selectedShapes: without(state.selectedShapes, action.payload),
+        selectedShapeIds: without(state.selectedShapeIds, action.payload.id),
       }
     }
 
-    case ACTIONS.REMOVE_SELECTED_SHAPE: {
-      if (state.selectedShape) {
-        const shapes = without(state.shapes, state.selectedShape)
+    case ACTIONS.PROMOTE_SHAPE: {
+      return state
+    }
+
+    case ACTIONS.DEMOTE_SHAPE: {
+      return state
+    }
+
+    case ACTIONS.REMOVE_SELECTED_SHAPES: {
+      if (state.selectedShapes.length) {
+        const shapesList = state.shapesList.removeManyById(
+          state.selectedShapeIds
+        )
 
         return {
           ...state,
-          shapes,
-          selectedShape: shapes.length ? shapes[shapes.length - 1] : null,
+          shapesList,
+          selectedShapes: shapesList.shapes.length
+            ? [shapesList.last().id]
+            : initialSelectedShapes,
         }
       } else {
         return state
       }
     }
 
-    case ACTIONS.SELECT_SHAPE:
+    case ACTIONS.SELECT_SHAPE: {
+      const { shapesList, selectedShapeIds } = state
+
+      if (!action.payload) {
+        return {
+          ...state,
+          selectedShapes: initialSelectedShapes,
+          selectedShapeIds: initialSelectedShapeIds,
+        }
+      }
+
+      const { id, groupId } = action.payload
+      const identifier = groupId || id
+
+      if (action.toggle) {
+        const selectedIds = action.isAlreadySelected
+          ? without(selectedShapeIds, identifier)
+          : [...selectedShapeIds, identifier]
+
+        return {
+          ...state,
+          selectedShapes: shapesList.shapes.filter((s) =>
+            selectedIds.includes(s.id)
+          ),
+          selectedShapeIds: selectedIds,
+        }
+      }
+
       return {
         ...state,
-        selectedShape: action.payload,
+        selectedShapes: shapesList.shapes.filter((s) => s.id === identifier),
+        selectedShapeIds: [identifier],
+      }
+    }
+
+    case ACTIONS.DESELECT_SHAPES:
+      return {
+        ...state,
+        selectedShapes: initialSelectedShapes,
+        selectedShapeIds: initialSelectedShapeIds,
+      }
+
+    case ACTIONS.GROUP_SHAPES:
+      return {
+        ...state,
+        shapesList: state.shapesList.groupShapes(
+          state.selectedShapeIds,
+          action.payload
+        ),
+        selectedShapes: [action.payload],
+        selectedShapeIds: [action.payload.id],
+      }
+
+    case ACTIONS.UNGROUP_SHAPES:
+      return {
+        ...state,
+        shapesList: state.shapesList.ungroupShapes(state.selectedShapeIds),
+        selectedShapes: initialSelectedShapes,
+        selectedShapeIds: initialSelectedShapeIds,
       }
 
     // Tools
@@ -150,15 +241,17 @@ const reducer = (state, action) => {
 
     default:
       console.error('Unknown action!', action)
+      debugger
       return state
   }
 }
 
 const initialState = {
   loading: false,
-  shapes: [],
+  shapesList: new ShapesList(),
   selectedTool: Tools.SELECT,
-  selectedShape: null,
+  selectedShapes: initialSelectedShapes,
+  selectedShapeIds: initialSelectedShapeIds,
   zoomScale: initialZoomScale,
   translation: initialTranslation,
 }
@@ -168,9 +261,10 @@ function App() {
 
   const {
     loading,
-    shapes,
+    shapesList,
     selectedTool,
-    selectedShape,
+    selectedShapes,
+    selectedShapeIds,
     zoomScale,
     translation,
   } = state
@@ -178,11 +272,15 @@ function App() {
   const gridSize = GRID_BASE_SIZE * zoomScale
 
   useEffect(() => {
+    console.log('State After: ', state)
+  }, [state])
+
+  useEffect(() => {
     try {
       const savedShapes = localStorage.getItem(STORAGE_KEY)
       const savedZoom = localStorage.getItem(STORAGE_KEY_ZOOM)
       const savedTranslation = localStorage.getItem(STORAGE_KEY_PAN)
-      // setShapes(JSON.parse(savedShapes) || [])
+
       dispatch({
         type: ACTIONS.HYDRATE,
         payload: {
@@ -220,14 +318,9 @@ function App() {
     dispatch({ type: ACTIONS.RESET_PAN_ZOOM })
   }, [dispatch])
 
-  const addShape = useCallback(
-    (shape) => {
-      const newShape = { ...shape, id: shapes.length }
-      dispatch({ type: ACTIONS.ADD_SHAPE, payload: newShape })
-      return newShape
-    },
-    [shapes]
-  )
+  const addShape = useCallback((shape) => {
+    dispatch({ type: ACTIONS.ADD_SHAPE, payload: shape })
+  }, [])
 
   const removeShape = useCallback((shape) => {
     if (shape.id === undefined) {
@@ -240,9 +333,9 @@ function App() {
     })
   }, [])
 
-  const removeSelectedShape = useCallback(() => {
+  const removeSelectedShapes = useCallback(() => {
     dispatch({
-      type: ACTIONS.REMOVE_SELECTED_SHAPE,
+      type: ACTIONS.REMOVE_SELECTED_SHAPES,
     })
   }, [])
 
@@ -254,17 +347,63 @@ function App() {
     })
   }, [])
 
-  const selectShape = useCallback((shape) => {
+  const promoteShape = useCallback((shape) => {
     dispatch({
-      type: ACTIONS.SELECT_SHAPE,
+      type: ACTIONS.PROMOTE_SHAPE,
       payload: shape,
     })
   }, [])
 
-  const unselectShape = useCallback(() => {
+  const demoteShape = useCallback((shape) => {
     dispatch({
-      type: ACTIONS.SELECT_SHAPE,
-      payload: null,
+      type: ACTIONS.DEMOTE_SHAPE,
+      payload: shape,
+    })
+  }, [])
+
+  const selectShape = useCallback(
+    (shape, toggle = false) => {
+      const isAlreadySelected = selectedShapeIds.includes(
+        shape.groupId || shape.id
+      )
+
+      if (!toggle && isAlreadySelected) {
+        return
+      }
+
+      dispatch({
+        type: ACTIONS.SELECT_SHAPE,
+        payload: shape,
+        toggle,
+        isAlreadySelected,
+      })
+    },
+    [selectedShapeIds]
+  )
+
+  const deselectShapes = useCallback(() => {
+    if (selectedShapeIds.length) {
+      dispatch({
+        type: ACTIONS.DESELECT_SHAPES,
+      })
+    }
+  }, [selectedShapeIds])
+
+  const groupSelected = useCallback(() => {
+    const groupId = ShapesList.generateId()
+
+    dispatch({
+      type: ACTIONS.GROUP_SHAPES,
+      payload: createShape(Tools.GROUP, {
+        id: groupId,
+        shapes: selectedShapes.map((s) => s.update({ groupId })),
+      }),
+    })
+  }, [selectedShapes])
+
+  const ungroupSelected = useCallback(() => {
+    dispatch({
+      type: ACTIONS.UNGROUP_SHAPES,
     })
   }, [])
 
@@ -277,12 +416,14 @@ function App() {
 
   const appState = {
     data: {
-      shapes,
+      shapes: shapesList.shapes,
       actions: {
         addShape,
         removeShape,
         updateShape,
-        removeSelectedShape,
+        promoteShape,
+        demoteShape,
+        removeSelectedShapes,
       },
     },
     toolbar: {
@@ -297,7 +438,8 @@ function App() {
       zoomScalePercent: parseInt(zoomScale * 100, 10),
       translation,
       canDraw: canDraw(selectedTool),
-      selectedShape,
+      selectedShapes,
+      selectedShapeIds,
       actions: {
         zoomIn,
         zoomOut,
@@ -305,16 +447,18 @@ function App() {
         clear,
         centerViewport,
         selectShape,
-        unselectShape,
+        deselectShapes,
+        groupSelected,
+        ungroupSelected,
       },
     },
   }
 
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(shapes))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(shapesList.shapes))
     }
-  }, [loading, shapes])
+  }, [loading, shapesList])
 
   useEffect(() => {
     if (!loading) {
@@ -332,9 +476,11 @@ function App() {
     <AppState.Provider value={appState}>
       <div className="app-container">
         {/* <Menu /> */}
-        <Canvas />
-        <Toolbar />
-        <Controls />
+        <div className="app-wrapper">
+          <Canvas />
+          <Toolbar />
+          <Controls />
+        </div>
 
         <div className="app-debug">
           <pre>{JSON.stringify(appState, null, 2)}</pre>

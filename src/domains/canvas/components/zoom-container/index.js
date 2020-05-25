@@ -2,8 +2,6 @@ import React, { useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import { useThrottleCallback } from '@react-hook/throttle'
 
-import './zoom-container.css'
-
 function ZoomContainer({ children }) {
   const state = useAppState()
 
@@ -23,7 +21,7 @@ function ZoomContainer({ children }) {
     [zoomIn, zoomOut]
   )
 
-  const onScrollThrottled = useThrottleCallback(onScroll, 6, true)
+  const onScrollThrottled = useThrottleCallback(onScroll, 5, true)
 
   return (
     <div

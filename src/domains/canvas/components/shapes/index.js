@@ -1,45 +1,43 @@
 import React, { useCallback } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import { Tools } from '../../../toolbar'
-import Line from './line'
-import Rect from './rect'
-import Circle from './circle'
+import Shape from './shape'
 
-const shapeMap = {
-  [Tools.LINE]: Line,
-  [Tools.RECT]: Rect,
-  [Tools.CIRCLE]: Circle,
+function isKeyboardFocus() {
+  return document.documentElement.dataset.whatintent !== 'keyboard'
 }
 
-function Shapes() {
+function Shapes({ shapes, selectedShapeIds = [], constrained }) {
   const state = useAppState()
 
   const { selectShape } = state.canvas.actions
-  const { zoomScale, selectedShape } = state.canvas
+  const { zoomScale } = state.canvas
 
   const onSelectShape = useCallback(
-    (shape) => () => {
+    (e, shape, isFocus) => {
       if (state.toolbar.selected === Tools.SELECT) {
-        selectShape(shape)
+        if (isFocus && isKeyboardFocus()) {
+          return
+        }
+
+        selectShape(shape, !!e.shiftKey)
       }
     },
     [state.toolbar.selected, selectShape]
   )
 
-  return state.data.shapes.map((shape) => {
-    if (!(shape.type in shapeMap)) {
-      throw new Error(`Unkown shape! "${shape}"`)
-    }
-
-    const Component = shapeMap[shape.type]
-
+  return shapes.map((shape) => {
     return (
-      <Component
+      <Shape
         key={shape.id}
-        scaleFactor={zoomScale}
-        onSelect={onSelectShape(shape)}
-        selected={selectedShape ? shape.id === selectedShape.id : false}
-        {...shape}
+        shape={shape}
+        scale={(v) => v * zoomScale}
+        onSelect={(e) => onSelectShape(e, shape, false)}
+        onFocus={(e) => onSelectShape(e, shape, true)}
+        constrained={constrained}
+        selected={
+          selectedShapeIds.length ? selectedShapeIds.includes(shape.id) : false
+        }
       />
     )
   })
