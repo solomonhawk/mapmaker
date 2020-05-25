@@ -9,3 +9,11 @@
   position: absolute;
   border: 1px solid red;
 }
+
+.canvas.tool-pan {
+  cursor: grab;
+}
+
+.canvas.tool-move.has-selection {
+  cursor: move;
+}

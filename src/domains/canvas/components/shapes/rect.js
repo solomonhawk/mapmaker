@@ -12,8 +12,6 @@ function Rect({ shape, selected, onFocus, onSelect, scale }) {
     fill: 'none',
   }
 
-  console.log(selected)
-
   return (
     <>
       <rect {...rectProps} strokeWidth="2" stroke="#333" fill="none" />

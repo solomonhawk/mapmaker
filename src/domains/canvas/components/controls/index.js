@@ -1,12 +1,19 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useAppState } from '../../../../services/app-state'
 import Selected from './selected'
+import { usePointer } from '../pointer-container/hook'
+
+import {
+  mapPointerToGridOrigin,
+  mapPointerToGrid,
+  quantizedViewportCenter,
+} from '../canvas/helpers'
+
 import './controls.css'
 
-function Controls() {
-  // console.log('render controls')
+function Controls({ viewport }) {
   const state = useAppState()
-
+  const pointer = usePointer()
   const { selectedShapes, zoomScalePercent, actions } = state.canvas
 
   const {
@@ -23,6 +30,15 @@ function Controls() {
       actions.clear()
     }
   }, [actions])
+
+  const getCurrentPoint = useCallback(() => {
+    const totalOffset = quantizedViewportCenter(viewport, state.canvas)
+    const position = mapPointerToGrid(pointer, totalOffset, state.canvas)
+
+    return mapPointerToGridOrigin(position, viewport, state.canvas)
+  }, [pointer, state.canvas, viewport])
+
+  const currentPoint = useMemo(() => getCurrentPoint(), [getCurrentPoint])
 
   return (
     <div className="canvas-controls">
@@ -69,8 +85,14 @@ function Controls() {
           </button>
         </li>
 
-        <li className="canvas-controls-item canvas-control-item-zoom">
+        <li className="canvas-controls-item canvas-control-item-text">
           <div className="canvas-zoom">Zoom: {zoomScalePercent}%</div>
+        </li>
+
+        <li className="canvas-controls-item canvas-control-item-position">
+          <div className="current-point">
+            x: {currentPoint.x}, y: {currentPoint.y}
+          </div>
         </li>
       </ul>
     </div>

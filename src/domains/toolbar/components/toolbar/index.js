@@ -9,6 +9,7 @@ import Hotkeys from '../hotkeys'
 function Toolbar() {
   const state = useAppState()
 
+  const { removeSelectedShapes } = state.data.actions
   const { selectTool } = state.toolbar.actions
 
   const onSelectTool = useCallback(
@@ -23,27 +24,30 @@ function Toolbar() {
   )
 
   const tools = useMemo(
-    () =>
-      [
-        { type: Tools.SELECT, icon: '⍙' },
-        { type: Tools.PAN, icon: '❖' },
-        { type: Tools.LINE, icon: '⎮' },
-        { type: Tools.RECT, icon: '□' },
-        { type: Tools.CIRCLE, icon: ' ⃝' },
-      ].map((t, i) => ({ ...t, binding: i + 1 })),
+    () => [
+      { type: Tools.SELECT, icon: '⍙', binding: 1 },
+      { type: Tools.PAN, icon: '❖', binding: 2 },
+      { type: Tools.MOVE, icon: '✧', binding: 3 },
+      { type: Tools.LINE, icon: '⎮', binding: 'q' },
+      { type: Tools.RECT, icon: '□', binding: 'w' },
+      { type: Tools.CIRCLE, icon: ' ⃝', binding: 'e' },
+    ],
     []
   )
 
   return (
     <>
       <Hotkeys
-        bindings={tools.reduce(
-          (acc, tool) => ({
-            ...acc,
-            [tool.binding]: onSelectTool(tool.type),
-          }),
-          {}
-        )}
+        bindings={{
+          ...tools.reduce(
+            (acc, tool) => ({
+              ...acc,
+              [tool.binding]: onSelectTool(tool.type),
+            }),
+            {}
+          ),
+          c: removeSelectedShapes,
+        }}
       />
 
       <div className="toolbar tools">

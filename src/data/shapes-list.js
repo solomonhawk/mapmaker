@@ -3,6 +3,7 @@ import { createShape } from './shapes'
 import { v4 as uuid } from 'uuid'
 import partition from 'lodash-es/partition'
 import flatMap from 'lodash-es/flatMap'
+import { Tools } from '../domains/toolbar'
 
 export default class ShapesList {
   static generateId() {
@@ -61,14 +62,21 @@ export default class ShapesList {
   }
 
   ungroupShapes(selectedIds) {
-    const [grouped, notGrouped] = partition(this.shapes, (s) =>
+    const [selected, notSelected] = partition(this.shapes, (s) =>
       selectedIds.includes(s.id)
     )
+    const [grouped, notGrouped] = partition(
+      selected,
+      (s) => s.type === Tools.GROUP
+    )
+
     const ungroupedShapes = flatMap(grouped, (g) =>
       g.shapes.map((s) => s.update({ groupId: null }))
     )
 
-    return new ShapesList(notGrouped.concat(ungroupedShapes))
+    return new ShapesList(
+      notSelected.concat(notGrouped).concat(ungroupedShapes)
+    )
   }
 
   // private

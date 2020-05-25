@@ -4,15 +4,13 @@ import './grid.css'
 import { useAppState } from '../../../../services/app-state'
 
 function Grid({ viewport, children }) {
-  // console.log('render grid')
   const state = useAppState()
 
   const { shapes } = state.data
   const { translation, gridSize, zoomScale, selectedShapeIds } = state.canvas
 
-  // TODO: scale?
-  const translateX = translation.x // * zoomScale;
-  const translateY = translation.y // * zoomScale;
+  const translateX = translation.x
+  const translateY = translation.y
 
   return (
     <div className="grid">
@@ -59,14 +57,14 @@ function Grid({ viewport, children }) {
           <pattern
             id="vCenter"
             x="50%"
-            width="1000"
+            width={gridSize * 10}
             height="1"
             patternUnits="userSpaceOnUse"
             patternTransform={`translate(${translateX} ${translateY})`}
           >
             <path
               transform="translate(0.5 0)"
-              d="M 0 0 V 1000"
+              d={`M 0 0 V ${gridSize * 10}`}
               fill="none"
               stroke="#85b7c9"
               strokeWidth="1"
@@ -76,14 +74,14 @@ function Grid({ viewport, children }) {
           <pattern
             id="hCenter"
             y="50%"
-            height="1000"
+            height={gridSize * 10}
             width="1"
             patternUnits="userSpaceOnUse"
             patternTransform={`translate(${translateX} ${translateY})`}
           >
             <path
               transform="translate(0 0.5)"
-              d="M 0 0 H 1000"
+              d={`M 0 0 H ${gridSize * 10}`}
               fill="none"
               stroke="#85b7c9"
               strokeWidth="1"

@@ -30,10 +30,6 @@ function PanContainer({ children }) {
         setCanDrag(true)
         state.toolbar.actions.selectTool(Tools.PAN)
       }
-
-      // Intentionally omitted so that onKeyDown only sees the state as it existed
-      // prior to initiating the pan tool
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [canDrag, state.toolbar.selected, state.toolbar.actions]
   )
@@ -118,16 +114,7 @@ function PanContainer({ children }) {
     }
   }, [onDrag])
 
-  return (
-    <div
-      className="pan-container viewport-container"
-      style={{
-        cursor: dragEnabled ? 'pointer' : 'default',
-      }}
-    >
-      {children}
-    </div>
-  )
+  return <div className="pan-container viewport-container">{children}</div>
 }
 
 export default PanContainer

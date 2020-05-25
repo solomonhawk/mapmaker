@@ -1,19 +1,18 @@
 import 'what-input'
 
 import React, { useReducer, useCallback, useEffect } from 'react'
-// import Menu from './domains/menu/components/menu'
 import Toolbar from './domains/toolbar/components/toolbar'
 import Canvas from './domains/canvas/components/canvas'
 import { AppState } from './services/app-state'
 import { Tools } from './domains/toolbar'
-import Controls from './domains/canvas/components/controls'
 import without from 'lodash-es/without'
 import ShapesList from './data/shapes-list'
 import { createShape } from './data/shapes'
+import Debug from './debug'
 
 import './App.css'
 
-const GRID_BASE_SIZE = 50
+const GRID_BASE_SIZE = 25
 const MAX_ZOOM = 4
 const MIN_ZOOM = 0.125
 
@@ -130,12 +129,15 @@ const reducer = (state, action) => {
           state.selectedShapeIds
         )
 
+        const selectedShapes = shapesList.shapes.length
+          ? [shapesList.last()]
+          : initialSelectedShapes
+
         return {
           ...state,
           shapesList,
-          selectedShapes: shapesList.shapes.length
-            ? [shapesList.last().id]
-            : initialSelectedShapes,
+          selectedShapes,
+          selectedShapeIds: selectedShapes.map((s) => s.id),
         }
       } else {
         return state
@@ -479,12 +481,9 @@ function App() {
         <div className="app-wrapper">
           <Canvas />
           <Toolbar />
-          <Controls />
         </div>
 
-        <div className="app-debug">
-          <pre>{JSON.stringify(appState, null, 2)}</pre>
-        </div>
+        <Debug state={appState} />
       </div>
     </AppState.Provider>
   )

@@ -6,8 +6,17 @@ import PointerContainer from '../pointer-container'
 import ZoomContainer from '../zoom-container'
 import PanContainer from '../pan-container'
 import { useAppState } from '../../../../services/app-state'
-
+import cx from 'classnames'
+import Controls from '../controls'
 import './canvas.css'
+
+function lower(str) {
+  if (str) {
+    return str.toLowerCase()
+  }
+
+  return null
+}
 
 function Canvas() {
   const state = useAppState()
@@ -16,6 +25,8 @@ function Canvas() {
 
   const { removeSelectedShapes } = state.data.actions
   const { deselectShapes } = state.canvas.actions
+  const { selected: selectedTool } = state.toolbar
+  const { selectedShapeIds } = state.canvas
 
   const onKeyDown = useCallback(
     (e) => {
@@ -54,7 +65,15 @@ function Canvas() {
   }, [onResize])
 
   return (
-    <div className="canvas" ref={canvasRef} tabIndex={0} onClick={onClick}>
+    <div
+      ref={canvasRef}
+      tabIndex={0}
+      onClick={onClick}
+      className={cx('canvas', {
+        [`tool-${lower(selectedTool)}`]: !!selectedTool,
+        'has-selection': selectedShapeIds.length,
+      })}
+    >
       {canvasSize ? (
         <PanContainer>
           <ZoomContainer>
@@ -72,6 +91,8 @@ function Canvas() {
                   />
                 ) : null}
               </Grid>
+
+              <Controls viewport={canvasSize} />
             </PointerContainer>
           </ZoomContainer>
         </PanContainer>

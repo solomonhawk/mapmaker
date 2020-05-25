@@ -7,6 +7,12 @@ body,
   padding: 0;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   overflow: hidden;
 }
@@ -25,15 +31,43 @@ body {
 }
 
 .app-debug {
+  position: relative;
   background: #333;
   color: #fff;
   padding: 8px;
-  width: 20%;
-  flex-basis: 20%;
   font-size: 12px;
   overflow: scroll;
+  width: 20px;
+  flex-basis: 20px;
   flex-shrink: 0;
+  z-index: 1;
+}
+
+.app-debug:not(.expanded) > *:not(.app-debug-toggle) {
+  opacity: 0;
+}
+
+.app-debug.expanded {
   min-width: 300px;
+  width: 20%;
+  flex-basis: 20%;
+}
+
+.app-debug.expanded .app-debug-toggle {
+  opacity: 0;
+}
+
+.app-debug-toggle {
+  color: #fff;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  padding: 0;
 }
 
 .app-debug pre {

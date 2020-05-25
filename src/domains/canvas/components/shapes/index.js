@@ -7,6 +7,10 @@ function isKeyboardFocus() {
   return document.documentElement.dataset.whatintent !== 'keyboard'
 }
 
+function canSelect(tool) {
+  return [Tools.SELECT, Tools.MOVE].includes(tool)
+}
+
 function Shapes({ shapes, selectedShapeIds = [], constrained }) {
   const state = useAppState()
 
@@ -15,7 +19,7 @@ function Shapes({ shapes, selectedShapeIds = [], constrained }) {
 
   const onSelectShape = useCallback(
     (e, shape, isFocus) => {
-      if (state.toolbar.selected === Tools.SELECT) {
+      if (canSelect(state.toolbar.selected)) {
         if (isFocus && isKeyboardFocus()) {
           return
         }

@@ -6,7 +6,6 @@ import { quantizedViewportCenter, mapPointerToGrid } from '../canvas/helpers'
 import './cursor.css'
 
 function Cursor({ viewport }) {
-  // console.log('render cursor')
   const state = useAppState()
   const pointer = usePointer()
 
